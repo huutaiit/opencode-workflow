@@ -1,0 +1,215 @@
+{
+  "$comment": "TypeScript React FSD stack — Feature-Sliced Design + enterprise variant (AntD 5 + Zustand + TQ v5)",
+  "name": "TypeScript React (FSD)",
+  "language": "typescript",
+  "framework": "react",
+  "version": { "typescript": "5.x", "react": "19.x" },
+  "extensions": [".ts", ".tsx", ".js", ".jsx"],
+
+  "searchKeywords": {
+    "frontend": ["React", "TypeScript", "FSD", "Ant Design", "Zustand", "TanStack Query"],
+    "patterns": ["Feature-Sliced Design", "React Composition", "Custom Hooks"],
+    "libraries": ["antd", "zustand", "@tanstack/react-query", "react-router-dom", "axios"],
+    "testing": ["Vitest", "React Testing Library", "MSW"],
+    "package": ["npm", "yarn", "package.json", "vite"],
+    "exclude": ["C#", "ASP.NET", "Spring", "Java", "Maven", "Django", "FastAPI"]
+  },
+
+  "parsing": {
+    "parser": "typescript-parser",
+    "extractor": "react-extractor",
+    "patterns": {
+      "component": { "namePrefix": null, "exports": ["function *", "const *: FC"], "nodeType": "Component" },
+      "hook": { "namePrefix": "use", "files": ["use*.ts", "use*.tsx"], "nodeType": "Hook" },
+      "context": { "nameSuffix": ["Context", "Provider"], "exports": ["createContext"], "nodeType": "Context" },
+      "store": { "imports": ["zustand", "@reduxjs/toolkit"], "nodeType": "Store" },
+      "query": { "imports": ["@tanstack/react-query"], "nodeType": "Query" }
+    }
+  },
+  "architecture": {
+    "supportedArchitectures": ["feature-sliced-design"],
+    "defaultArchitecture": "feature-sliced-design",
+    "autoDetection": {
+      "feature-sliced-design": {
+        "requiredDirs": ["features", "entities", "shared"],
+        "indicators": ["app/", "pages/", "widgets/"],
+        "confidence": 0.95
+      }
+    },
+    "layerMappings": {
+      "feature-sliced-design": {
+        "app": { "pathPatterns": ["**/app/**/*.ts", "**/app/**/*.tsx"], "stereotype": "App" },
+        "pages": { "pathPatterns": ["**/pages/**/*.tsx"], "stereotype": "Page" },
+        "widgets": { "pathPatterns": ["**/widgets/**/*.tsx"], "stereotype": "Widget" },
+        "features": { "pathPatterns": ["**/features/**/*.ts", "**/features/**/*.tsx"], "stereotype": "Feature" },
+        "entities": { "pathPatterns": ["**/entities/**/*.ts"], "stereotype": "Entity" },
+        "shared": { "pathPatterns": ["**/shared/**/*.ts", "**/shared/**/*.tsx"], "stereotype": "Shared" },
+        "test": { "pathPatterns": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"], "stereotype": "Test" }
+      }
+    }
+  },
+  "variants": {
+    "enterprise": {
+      "name": "React Enterprise (FSD + AntD 5)",
+      "description": "React 19 SPA with FSD architecture, Ant Design 5, Zustand, TanStack Query v5, React Router v7",
+      "detection": {
+        "files": ["package.json"],
+        "requires": ["react", "antd", "zustand"],
+        "priority": 1
+      },
+      "validation": {
+        "files": ["package.json"],
+        "mustHave": ["react", "antd"]
+      },
+      "patterns": {
+        "use_react_19": true,
+        "use_typescript": true,
+        "use_fsd": true,
+        "use_antd": true,
+        "use_zustand": true,
+        "use_tanstack_query": true,
+        "use_react_router": true,
+        "use_vite": true,
+        "use_axios": true,
+        "use_signalr": true
+      },
+      "specialists": {
+        "architecture": [
+          "react-fsd-architecture",
+          "react-clean-architecture",
+          "react-module-organization",
+          "react-monorepo"
+        ],
+        "core": [
+          "react-provider-composition",
+          "react-configuration",
+          "react-dependency-injection"
+        ],
+        "language": [
+          "react-typescript-generics",
+          "react-ts-utility-types",
+          "react-ts-async-patterns",
+          "react-ts-design-patterns"
+        ],
+        "hooks": [
+          "react-custom-hooks",
+          "react-19-hooks",
+          "react-hook-lifecycle"
+        ],
+        "state": [
+          "react-zustand",
+          "react-redux-toolkit",
+          "react-context",
+          "react-jotai",
+          "react-xstate"
+        ],
+        "data": [
+          "react-tanstack-query",
+          "react-api-client",
+          "react-signalr",
+          "react-socketio",
+          "react-graphql"
+        ],
+        "patterns": [
+          "react-compound-component",
+          "react-render-props",
+          "react-hoc",
+          "react-headless-patterns",
+          "react-hook-patterns",
+          "react-data-fetching-patterns",
+          "react-state-history-patterns"
+        ],
+        "ui": [
+          "react-antd-form",
+          "react-antd-table",
+          "react-antd-design-system",
+          "react-antd-layout",
+          "react-accessibility",
+          "react-loading-states",
+          "react-modal-dialog",
+          "react-responsive-layout"
+        ],
+        "forms": [
+          "react-antd-form-patterns",
+          "react-schema-driven-forms",
+          "react-form-actions"
+        ],
+        "routing": [
+          "react-router",
+          "react-protected-routes",
+          "react-tanstack-router"
+        ],
+        "auth": [
+          "react-auth-flow",
+          "react-oauth2-oidc",
+          "react-permission-rbac"
+        ],
+        "security": [
+          "react-xss-prevention",
+          "react-security-hardening"
+        ],
+        "performance": [
+          "react-rendering-optimization",
+          "react-bundle-optimization",
+          "react-virtualization",
+          "react-web-vitals"
+        ],
+        "error-handling": [
+          "react-error-boundary",
+          "react-error-tracking"
+        ],
+        "cross-cutting": [
+          "react-logging",
+          "react-observability",
+          "react-analytics",
+          "react-feature-flags"
+        ],
+        "testing": [
+          "react-unit-testing",
+          "react-integration-testing",
+          "react-e2e-testing",
+          "react-storybook"
+        ],
+        "devops": [
+          "react-vite-build",
+          "react-docker",
+          "react-cicd"
+        ],
+        "domain": [
+          "react-domain-models",
+          "react-validation-schemas",
+          "react-domain-events"
+        ],
+        "localization": [
+          "react-i18n",
+          "react-rtl-formatting"
+        ],
+        "animation": [
+          "react-motion",
+          "react-css-transitions"
+        ],
+        "layout": [
+          "react-layout-patterns",
+          "react-skeleton-loading"
+        ],
+        "features": [
+          "react-rich-text-editor",
+          "react-antd-charts"
+        ],
+        "dnd": [
+          "react-drag-drop"
+        ],
+        "styling": [
+          "react-antd-tokens-styling"
+        ],
+        "pwa": [
+          "react-pwa"
+        ]
+      },
+      "specialistDir": "reactjs-fsd",
+      "kb_path": {
+        "frontend": ".claude/utils/knowledge-base/frontend-kb-react.json"
+      }
+    }
+  }
+}

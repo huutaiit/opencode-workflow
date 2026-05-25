@@ -1,0 +1,409 @@
+# React GraphQL Specialist
+# React GraphQLスペシャリスト
+# Chuyen Gia GraphQL React
+
+**Stack**: React 19 + TypeScript 5 | **Variant**: enterprise
+
+---
+
+## Architecture Metadata
+
+| Property | Value |
+|----------|-------|
+| **Layer** | Shared, Entities (client in shared, queries in entities) |
+| **Directory Pattern** | `src/shared/api/graphql/`, `src/entities/{name}/api/graphql/` |
+| **Variant** | enterprise |
+| **Pattern Numbers** | 24.1–24.10 |
+| **Source Paths** | `src/shared/api/graphql/**`, `**/api/graphql/**`, `**/*.graphql` |
+| **File Count** | 5–15 files (client config, codegen config, fragments, queries per entity) |
+| **Naming Convention** | `{entity}.queries.graphql`, `{entity}.mutations.graphql`, `codegen.ts`, `apolloClient.ts` |
+| **Imports From** | Shared (config for GraphQL endpoint, auth for token) |
+| **Cannot Import** | Features directly (GraphQL client is shared infrastructure) |
+| **Imported By** | Entities (typed query hooks), Features (useMutation for actions) |
+| **Dependencies** | `@apollo/client:3.x` or `graphql-request:7.x`, `@graphql-codegen/cli:5.x` |
+| **When To Use** | GraphQL API projects, schema-driven development, normalized cache needs, subscription-based realtime |
+| **Source Skeleton** | `src/shared/api/graphql/client.ts`, `src/shared/api/graphql/codegen.ts`, `src/entities/{name}/api/{name}.queries.graphql` |
+| **Specialist Type** | code |
+| **Purpose** | Generate GraphQL client patterns — Apollo Client setup, code generation, typed queries/mutations, cache normalization, TanStack Query alternative |
+| **Activation Trigger** | files: **/*.graphql, **/api/graphql/**; keywords: graphql, apolloClient, gqlCodegen, graphqlQuery |
+
+---
+
+## Evidence Sources
+
+- E1: Apollo Client 3 documentation
+- E2: GraphQL Code Generator documentation
+- E3: graphql-request lightweight client
+- E4: TanStack Query + GraphQL integration patterns
+
+---
+
+## Patterns
+
+### Pattern 24.1: Apollo Client Setup (CRITICAL)
+
+```typescript
+// src/shared/api/graphql/apolloClient.ts
+import { ApolloClient, InMemoryCache, HttpLink, from } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { onError } from '@apollo/client/link/error';
+import { useAuthStore } from '@/shared/store/authStore';
+import { getRuntimeConfig } from '@/shared/config/runtime';
+
+const httpLink = new HttpLink({
+  uri: `${getRuntimeConfig().apiBaseUrl}/graphql`,
+});
+
+const authLink = setContext((_, { headers }) => {
+  const token = useAuthStore.getState().accessToken;
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  };
+});
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) => {
+      console.error(`[GraphQL Error]: ${message}`, { locations, path });
+    });
+  }
+  if (networkError) {
+    console.error(`[Network Error]: ${networkError.message}`);
+  }
+});
+
+export const apolloClient = new ApolloClient({
+  link: from([errorLink, authLink, httpLink]),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          users: { merge: false }, // Replace on refetch (pagination)
+        },
+      },
+      User: {
+        keyFields: ['id'], // Normalize by id
+      },
+    },
+  }),
+  defaultOptions: {
+    watchQuery: { fetchPolicy: 'cache-and-network' },
+    query: { fetchPolicy: 'cache-first' },
+  },
+});
+```
+
+### Pattern 24.2: Code Generation (CRITICAL)
+
+```typescript
+// codegen.ts
+import type { CodegenConfig } from '@graphql-codegen/cli';
+
+const config: CodegenConfig = {
+  schema: 'http://localhost:3000/graphql',
+  documents: 'src/**/*.graphql',
+  generates: {
+    'src/shared/api/graphql/__generated__/': {
+      preset: 'client',
+      plugins: [],
+      presetConfig: {
+        gqlTagName: 'gql',
+        fragmentMasking: false,
+      },
+    },
+  },
+  ignoreNoDocuments: true,
+};
+
+export default config;
+```
+
+```bash
+# package.json scripts
+"codegen": "graphql-codegen --config codegen.ts",
+"codegen:watch": "graphql-codegen --config codegen.ts --watch"
+```
+
+```graphql
+# src/entities/user/api/user.queries.graphql
+query GetUsers($page: Int!, $limit: Int!, $role: String) {
+  users(page: $page, limit: $limit, role: $role) {
+    items {
+      id
+      email
+      displayName
+      role
+      createdAt
+    }
+    total
+    hasMore
+  }
+}
+
+query GetUserById($id: ID!) {
+  user(id: $id) {
+    id
+    email
+    displayName
+    role
+    createdAt
+    profile {
+      avatar
+      bio
+      phone
+    }
+  }
+}
+
+# src/entities/user/api/user.mutations.graphql
+mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    id
+    email
+    displayName
+  }
+}
+
+mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
+  updateUser(id: $id, input: $input) {
+    id
+    email
+    displayName
+  }
+}
+```
+
+### Pattern 24.3: Apollo Typed Hooks (HIGH)
+
+```typescript
+// Auto-generated by codegen — typed hooks
+import { useGetUsersQuery, useGetUserByIdQuery, useCreateUserMutation } from '@/shared/api/graphql/__generated__/graphql';
+
+function UserList() {
+  const { data, loading, error, refetch } = useGetUsersQuery({
+    variables: { page: 1, limit: 20 },
+  });
+
+  if (loading) return <Spin />;
+  if (error) return <Alert type="error" message={error.message} />;
+
+  return (
+    <Table<User>
+      dataSource={data?.users.items}
+      rowKey="id"
+      pagination={{ total: data?.users.total }}
+    />
+  );
+}
+
+function CreateUserForm() {
+  const [createUser, { loading }] = useCreateUserMutation({
+    refetchQueries: ['GetUsers'], // Auto-refetch list after create
+  });
+
+  const onFinish = async (values: CreateUserInput) => {
+    await createUser({ variables: { input: values } });
+    message.success('User created');
+  };
+}
+```
+
+### Pattern 24.4: Cache Normalization (HIGH)
+
+```typescript
+const cache = new InMemoryCache({
+  typePolicies: {
+    User: {
+      keyFields: ['id'],
+      fields: {
+        displayName: {
+          read(existing, { readField }) {
+            return existing || `${readField('firstName')} ${readField('lastName')}`;
+          },
+        },
+      },
+    },
+    Query: {
+      fields: {
+        users: {
+          keyArgs: ['role'], // Cache separately per role filter
+          merge(existing, incoming) {
+            return incoming; // Replace on refetch (pagination)
+          },
+        },
+      },
+    },
+  },
+});
+
+// Direct cache update after mutation (no refetch needed)
+const [updateUser] = useUpdateUserMutation({
+  update(cache, { data }) {
+    if (data?.updateUser) {
+      cache.modify({
+        id: cache.identify(data.updateUser),
+        fields: {
+          displayName: () => data.updateUser.displayName,
+          email: () => data.updateUser.email,
+        },
+      });
+    }
+  },
+});
+```
+
+### Pattern 24.5: TanStack Query + graphql-request (HIGH)
+
+Lighter alternative to Apollo — reuse existing TanStack Query setup.
+
+```typescript
+// src/shared/api/graphql/gqlClient.ts
+import { GraphQLClient } from 'graphql-request';
+import { useAuthStore } from '@/shared/store/authStore';
+
+export const gqlClient = new GraphQLClient('/graphql', {
+  requestMiddleware: (request) => {
+    const token = useAuthStore.getState().accessToken;
+    return {
+      ...request,
+      headers: { ...request.headers, authorization: `Bearer ${token}` },
+    };
+  },
+});
+
+// src/entities/user/api/userQueries.ts
+import { queryOptions } from '@tanstack/react-query';
+import { gql } from 'graphql-request';
+import { gqlClient } from '@/shared/api/graphql/gqlClient';
+
+const GET_USERS = gql`
+  query GetUsers($page: Int!, $limit: Int!) {
+    users(page: $page, limit: $limit) {
+      items { id email displayName role }
+      total
+    }
+  }
+`;
+
+export const userGqlQueries = {
+  list: (params: { page: number; limit: number }) =>
+    queryOptions({
+      queryKey: ['users', 'gql', params],
+      queryFn: () => gqlClient.request<{ users: PaginatedResponse<User> }>(GET_USERS, params),
+      select: (data) => data.users,
+    }),
+};
+
+// Usage — same useQuery pattern as REST
+const { data } = useQuery(userGqlQueries.list({ page: 1, limit: 20 }));
+```
+
+### Pattern 24.6: Fragment Colocation (MEDIUM-HIGH)
+
+```graphql
+# src/entities/user/api/userFragment.graphql
+fragment UserFields on User {
+  id
+  email
+  displayName
+  role
+  createdAt
+}
+
+# src/entities/user/api/user.queries.graphql
+query GetUsers($page: Int!) {
+  users(page: $page) {
+    items { ...UserFields }
+    total
+  }
+}
+```
+
+### Pattern 24.7: Optimistic Updates (MEDIUM-HIGH)
+
+```typescript
+const [toggleUserStatus] = useToggleUserStatusMutation({
+  optimisticResponse: {
+    toggleUserStatus: {
+      __typename: 'User',
+      id: userId,
+      active: !currentUser.active,
+    },
+  },
+  update(cache, { data }) {
+    // Cache auto-updates via normalized ID
+  },
+});
+```
+
+### Pattern 24.8: Subscriptions (MEDIUM)
+
+```typescript
+import { useSubscription } from '@apollo/client';
+
+const NOTIFICATION_SUB = gql`
+  subscription OnNotification {
+    notificationReceived {
+      id title body type
+    }
+  }
+`;
+
+function NotificationListener() {
+  useSubscription(NOTIFICATION_SUB, {
+    onData: ({ data }) => {
+      notification.info({
+        message: data.data.notificationReceived.title,
+        description: data.data.notificationReceived.body,
+      });
+    },
+  });
+  return null;
+}
+```
+
+### Pattern 24.9: FSD Placement (MEDIUM)
+
+```
+src/shared/api/graphql/
+├── apolloClient.ts         # Apollo setup
+├── gqlClient.ts            # graphql-request (alternative)
+├── codegen.ts              # Code generation config
+└── __generated__/          # Auto-generated types + hooks
+
+src/entities/user/api/
+├── user.queries.graphql    # Query documents
+├── user.mutations.graphql  # Mutation documents
+├── userFragment.graphql    # Shared fragments
+└── index.ts                # Re-export generated hooks
+```
+
+### Pattern 24.10: Anti-patterns (MEDIUM)
+
+**1. Over-fetching** — Requesting all fields when you need 3.
+```graphql
+# BAD: query { user(id: $id) { ...AllFields } }
+# FIX: Request only needed fields, use fragments for shared sets
+```
+
+**2. Missing cache policies** — Default merge behavior causes stale data.
+
+**3. N+1 in fragments** — Fragment per component creates redundant queries. Use fragment colocation but batch queries.
+
+**4. Apollo + TanStack Query** — Using both in same project. Pick one.
+
+---
+
+## Quality Checklist
+
+- [ ] **Q1**: Patterns evidence-based (E1-E4)?
+- [ ] **Q2**: Pattern IDs unique (24.1–24.10)?
+- [ ] **Q3**: Trilingual header present?
+- [ ] **Q4**: No implementation code — patterns only?
+
+---
+
+*React GraphQL Specialist | EPS v3.2 | Metadata v2.1*

@@ -1,0 +1,173 @@
+{
+  "$comment": "PHP Laravel stack — EPS specialist configuration",
+  "name": "PHP Laravel",
+  "language": "php",
+  "framework": "laravel",
+  "version": {
+    "php": "8.3",
+    "laravel": "11.x",
+    "composer": "2.x"
+  },
+  "extensions": [".php"],
+
+  "searchKeywords": {
+    "backend": ["PHP", "Laravel", "Eloquent", "Artisan"],
+    "patterns": ["Clean Architecture PHP", "Repository Pattern Laravel", "Service Layer", "Action Pattern"],
+    "libraries": ["Spatie", "Livewire", "Inertia", "Sanctum", "Passport", "Horizon", "Telescope", "Octane"],
+    "testing": ["Pest", "PHPUnit", "Mockery", "Faker", "Laravel Dusk"],
+    "package": ["Composer", "composer.json", "packagist"],
+    "exclude": ["Java", "Spring Boot", "Maven", "NestJS", "TypeScript", "Django", "Flask"]
+  },
+
+  "parsing": {
+    "parser": "php-parser",
+    "extractor": "laravel-extractor",
+    "patterns": {
+      "controller": {
+        "markers": ["Controller"],
+        "nameSuffix": ["Controller"],
+        "nodeType": "Controller",
+        "extends": ["Controller", "ResourceController"]
+      },
+      "service": {
+        "markers": [],
+        "nameSuffix": ["Service", "ServiceImpl"],
+        "nodeType": "Service"
+      },
+      "action": {
+        "markers": [],
+        "nameSuffix": ["Action"],
+        "nodeType": "Action"
+      },
+      "model": {
+        "markers": [],
+        "nameSuffix": ["Model"],
+        "nodeType": "Model",
+        "extends": ["Model", "Authenticatable", "Pivot"]
+      },
+      "request": {
+        "markers": [],
+        "nameSuffix": ["Request"],
+        "nodeType": "FormRequest",
+        "extends": ["FormRequest"]
+      },
+      "resource": {
+        "markers": [],
+        "nameSuffix": ["Resource", "Collection"],
+        "nodeType": "Resource",
+        "extends": ["JsonResource", "ResourceCollection"]
+      },
+      "middleware": {
+        "markers": [],
+        "nameSuffix": ["Middleware"],
+        "nodeType": "Middleware"
+      },
+      "migration": {
+        "markers": [],
+        "directory": "database/migrations",
+        "nodeType": "Migration",
+        "extends": ["Migration"]
+      },
+      "provider": {
+        "markers": [],
+        "nameSuffix": ["ServiceProvider"],
+        "nodeType": "ServiceProvider",
+        "extends": ["ServiceProvider"]
+      },
+      "policy": {
+        "markers": [],
+        "nameSuffix": ["Policy"],
+        "nodeType": "Policy"
+      },
+      "job": {
+        "markers": [],
+        "nameSuffix": ["Job"],
+        "nodeType": "Job",
+        "implements": ["ShouldQueue"]
+      },
+      "event": {
+        "markers": [],
+        "nameSuffix": ["Event"],
+        "nodeType": "Event"
+      },
+      "listener": {
+        "markers": [],
+        "nameSuffix": ["Listener"],
+        "nodeType": "Listener",
+        "implements": ["ShouldQueue"]
+      },
+      "notification": {
+        "markers": [],
+        "nameSuffix": ["Notification"],
+        "nodeType": "Notification",
+        "extends": ["Notification"]
+      },
+      "observer": {
+        "markers": [],
+        "nameSuffix": ["Observer"],
+        "nodeType": "Observer"
+      },
+      "config": {
+        "directory": "config/",
+        "nodeType": "Config"
+      }
+    },
+    "annotations": {
+      "http": ["Route::get", "Route::post", "Route::put", "Route::patch", "Route::delete", "Route::resource", "Route::apiResource"],
+      "injection": ["app()", "__construct", "resolve()"],
+      "validation": ["validate()", "FormRequest", "Rule::"],
+      "transaction": ["DB::transaction", "DB::beginTransaction"],
+      "auth": ["auth()", "Gate::allows", "authorize()", "$this->authorize"],
+      "eloquent": ["belongsTo", "hasMany", "hasOne", "belongsToMany", "morphTo", "morphMany"]
+    }
+  },
+
+  "architecture": {
+    "supported": ["clean-architecture", "layered", "ddd", "modular", "hexagonal"],
+    "default": "layered",
+    "autoDetect": {
+      "clean-architecture": {
+        "indicators": ["app/Domain/", "app/Application/", "app/Infrastructure/", "app/Presentation/"],
+        "confidence": 0.9
+      },
+      "layered": {
+        "indicators": ["app/Http/Controllers/", "app/Models/", "app/Services/"],
+        "confidence": 0.8
+      },
+      "ddd": {
+        "indicators": ["src/Domain/", "src/Application/", "src/Infrastructure/"],
+        "confidence": 0.9
+      },
+      "modular": {
+        "indicators": ["app/Modules/", "modules/"],
+        "confidence": 0.85
+      }
+    }
+  },
+
+  "layerMappings": {
+    "Domain": {
+      "paths": ["app/Domain/", "src/Domain/"],
+      "stereotypes": ["Entity", "ValueObject", "DomainEvent", "DomainService", "Specification"]
+    },
+    "Application": {
+      "paths": ["app/Application/", "app/Services/", "app/Actions/"],
+      "stereotypes": ["Service", "Action", "Handler", "UseCase", "DTO", "Mapper"]
+    },
+    "Infrastructure": {
+      "paths": ["app/Infrastructure/", "app/Repositories/", "app/Providers/"],
+      "stereotypes": ["Repository", "ServiceProvider", "Adapter", "Gateway", "Client"]
+    },
+    "Presentation": {
+      "paths": ["app/Http/", "app/Console/", "routes/"],
+      "stereotypes": ["Controller", "FormRequest", "Resource", "Middleware", "Command"]
+    },
+    "Test": {
+      "paths": ["tests/"],
+      "stereotypes": ["TestCase", "Feature", "Unit"]
+    }
+  },
+
+  "variants": ["Standard", "DDD", "Modular", "ALL"],
+  "defaultVariant": "Standard"
+}

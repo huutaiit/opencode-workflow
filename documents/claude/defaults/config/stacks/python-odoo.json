@@ -1,0 +1,67 @@
+{
+  "name": "Python Odoo",
+  "framework": "odoo",
+  "version": {
+    "odoo": "18.0",
+    "python": "3.11+",
+    "postgresql": "13+",
+    "owl": "2.x"
+  },
+  "architecture": {
+    "supportedArchitectures": ["modular-erp"],
+    "layerMappings": {
+      "modular-erp": {
+        "model": { "path": "models/", "patterns": ["**/*.py"] },
+        "security": { "path": "security/", "patterns": ["*.csv", "*.xml"] },
+        "view": { "path": "views/", "patterns": ["*.xml"] },
+        "controller": { "path": "controllers/", "patterns": ["*.py"] },
+        "report": { "path": "reports/", "patterns": ["*.xml"] },
+        "owl": { "path": "static/src/", "patterns": ["**/*.js", "**/*.xml"] },
+        "wizard": { "path": "wizard/", "patterns": ["*.py", "*.xml"] },
+        "test": { "path": "tests/", "patterns": ["test_*.py"] },
+        "data": { "path": "data/", "patterns": ["*.xml", "*.csv"] },
+        "i18n": { "path": "i18n/", "patterns": ["*.po"] }
+      }
+    }
+  },
+  "variants": {
+    "enterprise": {
+      "name": "Odoo 18 Enterprise (OEEL-1)",
+      "description": "Full ERP: accounting, MRP, HR/payroll, POS, website, IoT, AI. Dual paradigm: Build New + Extend/Customize.",
+      "specialists": {
+        "core-orm": ["odoo-model-declaration", "odoo-inheritance", "odoo-field-basic", "odoo-field-relational", "odoo-field-computed", "odoo-api-decorators", "odoo-crud-recordset"],
+        "core-infra": ["odoo-security-access", "odoo-module-architecture"],
+        "extension": ["odoo-model-extension", "odoo-method-override", "odoo-view-extension", "odoo-security-extension", "odoo-bridge-module"],
+        "ui": ["odoo-views-xml", "odoo-owl-component", "odoo-qweb-template"],
+        "data": ["odoo-controller-api", "odoo-report", "odoo-wizard", "odoo-data-migration"],
+        "business": ["odoo-workflow-automation", "odoo-mail-chatter", "odoo-multi-company"],
+        "testing": ["odoo-testing", "odoo-coding-guidelines"],
+        "infra": ["odoo-deployment", "odoo-performance"],
+        "domain-accounting": ["odoo-account-move", "odoo-account-tax", "odoo-account-asset", "odoo-account-budget", "odoo-account-reports", "odoo-account-bank", "odoo-account-payment", "odoo-account-followup", "odoo-account-intercompany", "odoo-account-edi", "odoo-account-extract"],
+        "domain-inventory": ["odoo-stock-move", "odoo-stock-route", "odoo-stock-valuation", "odoo-stock-barcode", "odoo-stock-landed-costs", "odoo-stock-batch"],
+        "domain-mrp": ["odoo-mrp-bom", "odoo-mrp-production", "odoo-mrp-workorder", "odoo-mrp-quality", "odoo-mrp-plm", "odoo-mrp-mps", "odoo-mrp-subcontracting"],
+        "domain-sales": ["odoo-crm-pipeline", "odoo-sale-order", "odoo-sale-subscription", "odoo-sale-rental", "odoo-sale-commission", "odoo-sale-marketplace"],
+        "domain-hr": ["odoo-hr-employee", "odoo-hr-contract", "odoo-hr-attendance", "odoo-hr-leave", "odoo-hr-skills", "odoo-payroll-rules", "odoo-payroll-work-entry", "odoo-payroll-payslip", "odoo-shift-planning", "odoo-shift-attendance", "odoo-shift-payroll", "odoo-hr-appraisal", "odoo-hr-recruitment", "odoo-hr-referral"],
+        "domain-project": ["odoo-project-task", "odoo-planning-schedule", "odoo-timesheet", "odoo-helpdesk", "odoo-field-service"],
+        "domain-pos": ["odoo-pos-session", "odoo-pos-restaurant", "odoo-pos-self-order", "odoo-pos-payment"],
+        "domain-website": ["odoo-website-builder", "odoo-ecommerce-cart", "odoo-website-portal", "odoo-website-appointment"],
+        "domain-documents": ["odoo-documents-dms", "odoo-knowledge-base", "odoo-sign", "odoo-spreadsheet"],
+        "domain-marketing": ["odoo-marketing-automation", "odoo-social-media", "odoo-email-sms-campaign"],
+        "domain-facilities": ["odoo-room-booking", "odoo-frontdesk", "odoo-maintenance-asset"],
+        "domain-ai": ["odoo-ocr-extract", "odoo-data-cleaning", "odoo-ai-generator"],
+        "domain-communication": ["odoo-whatsapp", "odoo-voip"],
+        "domain-iot": ["odoo-iot-device", "odoo-iot-integration"],
+        "domain-delivery": ["odoo-delivery-carrier", "odoo-delivery-tracking"],
+        "domain-approvals": ["odoo-approval-workflow"]
+      },
+      "specialistDir": "python-odoo"
+    }
+  },
+
+  "qualityRules": {
+    "linter": "ruff",
+    "typecheck": "mypy",
+    "critical": ["no-hardcoded-ips", "ruff"],
+    "warning": ["naming-convention", "comment-style"]
+  }
+}

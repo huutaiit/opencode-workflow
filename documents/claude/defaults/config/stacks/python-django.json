@@ -1,0 +1,67 @@
+{
+  "$comment": "Python Django stack",
+  "name": "Python Django",
+  "language": "python",
+  "framework": "django",
+  "version": { "python": "3.13+", "django": "5.x" },
+  "extensions": [".py"],
+  "parsing": {
+    "parser": "python-parser",
+    "extractor": "django-extractor",
+    "patterns": {
+      "model": { "files": ["models.py"], "baseClasses": ["Model"], "nodeType": "Entity" },
+      "view": { "files": ["views.py"], "baseClasses": ["View", "APIView"], "nodeType": "Controller" },
+      "serializer": { "files": ["serializers.py"], "baseClasses": ["Serializer", "ModelSerializer"], "nodeType": "Class" },
+      "url": { "files": ["urls.py"], "nodeType": "Component" },
+      "admin": { "files": ["admin.py"], "baseClasses": ["ModelAdmin"], "nodeType": "Component" },
+      "form": { "files": ["forms.py"], "baseClasses": ["Form", "ModelForm"], "nodeType": "Component" }
+    }
+  },
+  "architecture": {
+    "supportedArchitectures": ["mtv", "clean-architecture", "modular"],
+    "defaultArchitecture": null,
+    "autoDetection": {
+      "mtv": { "requiredFiles": ["models.py", "views.py", "urls.py"], "requiredDirs": ["templates"], "confidence": 0.9 }
+    },
+    "layerMappings": {
+      "mtv": {
+        "model": { "files": ["models.py"], "baseClasses": ["Model"], "stereotype": "Model" },
+        "template": { "pathPatterns": ["**/templates/**"], "extensions": [".html"], "stereotype": "Template" },
+        "view": { "files": ["views.py"], "baseClasses": ["View", "APIView"], "stereotype": "View" }
+      }
+    },
+    "databasePatterns": {
+      "django-orm": {
+        "detection": { "imports": ["django.db.models"], "baseClasses": ["Model"] },
+        "technology": "Django ORM", "reactive": false
+      }
+    }
+  },
+  "variants": {},
+  "totalSpecialists": 48,
+  "specialistGroups": {
+    "architecture": { "dir": "architecture/", "count": 2, "range": "0.x" },
+    "models": { "dir": "models/", "count": 4, "range": "1.x-2.x" },
+    "views": { "dir": "views/", "count": 3, "range": "3.x-4.x" },
+    "drf": { "dir": "drf/", "count": 5, "range": "5.x-8.x" },
+    "admin": { "dir": "admin/", "count": 2, "range": "10.x" },
+    "forms-templates": { "dir": "forms-templates/", "count": 3, "range": "11.x-12.x" },
+    "security": { "dir": "security/", "count": 3, "range": "15.x-16.x" },
+    "middleware": { "dir": "middleware/", "count": 1, "range": "17.x" },
+    "data": { "dir": "data/", "count": 3, "range": "20.x-22.x" },
+    "realtime": { "dir": "realtime/", "count": 2, "range": "25.x" },
+    "file-handling": { "dir": "file-handling/", "count": 3, "range": "30.x-32.x" },
+    "messaging": { "dir": "messaging/", "count": 2, "range": "35.x" },
+    "testing": { "dir": "testing/", "count": 3, "range": "40.x-41.x" },
+    "devops": { "dir": "devops/", "count": 4, "range": "45.x-47.x" },
+    "ai-ml": { "dir": "ai-ml/", "count": 4, "range": "50.x-52.x" },
+    "language": { "dir": "language/", "count": 4, "range": "65.x-68.x" }
+  },
+
+  "qualityRules": {
+    "linter": "ruff",
+    "typecheck": "mypy",
+    "critical": ["no-hardcoded-ips", "ruff"],
+    "warning": ["naming-convention", "comment-style"]
+  }
+}
