@@ -135,18 +135,9 @@ function getCurrentState(): string {
 }
 
 export const AutoChainPlugin = async () => {
-  // Track standalone sessions where primary action has been detected.
-  // Once primaryActionDone is set, tool.execute.before blocks further tool calls,
-  // causing the AI to receive an error and return a final text response naturally.
-  // The session loop ends without being killed — user can type the next command.
-  const primaryActionDone = new Set<string>()
-  const BLOCKED_TOOLS = new Set([
-    "write",
-    "edit",
-    "bash",
-    "terminal",
-  ])
-  
+  const primaryActionDone = new Map<string, number>()
+  const RETRY_LIMIT = 3
+
   return {
     "command.execute.before": async (
       input: { command: string; sessionID: string; arguments: string },
@@ -159,6 +150,76 @@ export const AutoChainPlugin = async () => {
         output.parts = [...(output.parts || []), text]
         return
       }
+
+      const state = getCurrentState()
+      const nextStep = STATE_CHAIN[state]
+
+      if (nextStep) {
+        const nextText = [
+          `\n\n## Chain Context`,
+          `Current workflow state: **${state}**`,
+          `Next step after this command: **${nextStep.next}**${nextStep.condition ? ` (${nextStep.condition})` : ""}`,
+          ``,
+          `After completing ALL steps above, state the next step and **stop**.`,
+          `Do NOT suggest follow-up actions or continue the conversation.`,
+        ].join("\n")
+        output.parts = [
+          ...(output.parts || []),
+          { type: "text", text: nextText },
+        ]
+      } else {
+        output.parts = [
+          ...(output.parts || []),
+          { type: "text", text: COMPLETION_INSTRUCTION },
+        ]
+      }
+    },
+
+    "tool.execute.after": async (
+      input: { tool: string; sessionID: string; callID: string; args: any },
+    ) => {
+      if (primaryActionDone.has(input.sessionID)) return
+
+      for (const [, rule] of Object.entries(PRIMARY_ACTION_RULES)) {
+        if (rule(input.tool, input.args)) {
+          primaryActionDone.set(input.sessionID, 0)
+          return
+        }
+      }
+    },
+
+    "tool.execute.before": async (
+      input: { tool: string; sessionID: string; callID: string; args: any },
+    ) => {
+      const retries = primaryActionDone.get(input.sessionID)
+      if (retries === undefined) return
+
+      if (retries >= RETRY_LIMIT) {
+        throw new Error(
+          `SYSTEM: The setup command has already completed its work. ` +
+          `Your task is finished. Return your final response to the user ` +
+          `and stop. Do not make any more tool calls.`
+        )
+      }
+
+      primaryActionDone.set(input.sessionID, retries + 1)
+      throw new Error(
+        `SYSTEM: The primary action for this command has completed successfully. ` +
+        `Do not make any more tool calls. Return your final response now.`
+      )
+    },
+
+    event: async ({ event }: { event: { type: string; sessionID?: string } }) => {
+      if (event.type === "session.deleted" || event.type === "session.idle") {
+        if (event.sessionID) {
+          primaryActionDone.delete(event.sessionID)
+        } else {
+          primaryActionDone.clear()
+        }
+      }
+    },
+  }
+}
 
       const state = getCurrentState()
       const nextStep = STATE_CHAIN[state]
