@@ -11,11 +11,11 @@ const path = require("path")
 function scaffold(targetDir) {
   const dirs = [
     ".opencode",
-    ".opencode/agent",
-    ".opencode/command",
-    ".opencode/skill",
-    ".opencode/plugin",
-    ".opencode/config",
+    ".opencode/agents",
+    ".opencode/commands",
+    ".opencode/skills",
+    ".opencode/plugins",
+    ".opencode/configs",
     ".opencode/memory-bank",
   ]
 
@@ -33,7 +33,7 @@ function scaffold(targetDir) {
 
   // Copy default commands
   const srcDir = path.join(__dirname, "commands")
-  const dstDir = path.join(targetDir, ".opencode", "command")
+  const dstDir = path.join(targetDir, ".opencode", "commands")
   if (fs.existsSync(srcDir)) {
     if (!fs.existsSync(dstDir)) {
       fs.mkdirSync(dstDir, { recursive: true })
@@ -42,15 +42,37 @@ function scaffold(targetDir) {
     console.log("  ✅ Commands copied")
   }
 
+  // Copy agents
+  const agentSrc = path.join(__dirname, "agents")
+  const agentDst = path.join(targetDir, ".opencode", "agents")
+  if (fs.existsSync(agentSrc)) {
+    if (!fs.existsSync(agentDst)) {
+      fs.mkdirSync(agentDst, { recursive: true })
+    }
+    copyRecursive(agentSrc, agentDst, ".md")
+    console.log("  ✅ Agents copied")
+  }
+
   // Copy plugins
   const pluginSrc = path.join(__dirname, "plugins")
-  const pluginDst = path.join(targetDir, ".opencode", "plugin")
+  const pluginDst = path.join(targetDir, ".opencode", "plugins")
   if (fs.existsSync(pluginSrc)) {
     if (!fs.existsSync(pluginDst)) {
       fs.mkdirSync(pluginDst, { recursive: true })
     }
     copyRecursive(pluginSrc, pluginDst, ".ts")
     console.log("  ✅ Plugins copied")
+  }
+
+  // Copy skills
+  const skillSrc = path.join(__dirname, "skills")
+  const skillDst = path.join(targetDir, ".opencode", "skills")
+  if (fs.existsSync(skillSrc)) {
+    if (!fs.existsSync(skillDst)) {
+      fs.mkdirSync(skillDst, { recursive: true })
+    }
+    copyRecursive(skillSrc, skillDst, ".md")
+    console.log("  ✅ Skills copied")
   }
 
   console.log("")

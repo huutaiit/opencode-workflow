@@ -71,11 +71,11 @@ async function main() {
     const targetDir = process.cwd()
     const dirs = [
       ".opencode",
-      ".opencode/agent",
-      ".opencode/command",
-      ".opencode/skill",
-      ".opencode/plugin",
-      ".opencode/config",
+      ".opencode/agents",
+      ".opencode/commands",
+      ".opencode/skills",
+      ".opencode/plugins",
+      ".opencode/configs",
       ".opencode/memory-bank",
     ]
 
@@ -92,7 +92,7 @@ async function main() {
     }
 
     const cmdSrc = path.join(__dirname, "commands")
-    const cmdDst = path.join(targetDir, ".opencode", "command")
+    const cmdDst = path.join(targetDir, ".opencode", "commands")
     if (fs.existsSync(cmdSrc)) {
       fs.mkdirSync(cmdDst, { recursive: true })
       copyRecursive(cmdSrc, cmdDst, ".md")
@@ -100,11 +100,29 @@ async function main() {
     }
 
     const pluginSrc = path.join(__dirname, "plugins")
-    const pluginDst = path.join(targetDir, ".opencode", "plugin")
+    const pluginDst = path.join(targetDir, ".opencode", "plugins")
     if (fs.existsSync(pluginSrc)) {
       fs.mkdirSync(pluginDst, { recursive: true })
       copyRecursive(pluginSrc, pluginDst, ".ts")
       console.log("  ✅ Plugins copied")
+    }
+
+    // Copy agents
+    const agentSrc = path.join(__dirname, "agents")
+    const agentDst = path.join(targetDir, ".opencode", "agents")
+    if (fs.existsSync(agentSrc)) {
+      fs.mkdirSync(agentDst, { recursive: true })
+      copyRecursive(agentSrc, agentDst, ".md")
+      console.log("  ✅ Agents copied")
+    }
+
+    // Copy skills
+    const skillSrc = path.join(__dirname, "skills")
+    const skillDst = path.join(targetDir, ".opencode", "skills")
+    if (fs.existsSync(skillSrc)) {
+      fs.mkdirSync(skillDst, { recursive: true })
+      copyRecursive(skillSrc, skillDst, ".md")
+      console.log("  ✅ Skills copied")
     }
 
     console.log("")
