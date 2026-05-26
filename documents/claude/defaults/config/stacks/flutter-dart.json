@@ -1,0 +1,73 @@
+{
+  "$comment": "Flutter/Dart stack — Clean Architecture (feature-first)",
+  "name": "Flutter",
+  "language": "dart",
+  "framework": "flutter",
+  "version": { "dart": "3.x", "flutter": "3.x" },
+  "extensions": [".dart"],
+  "parsing": {
+    "parser": "dart-parser",
+    "patterns": {
+      "bloc": { "nameSuffix": ["bloc", "cubit"], "nodeType": "StateManager" },
+      "repository": { "nameSuffix": ["repository", "repo"], "nodeType": "Repository" },
+      "usecase": { "nameSuffix": ["usecase", "use_case"], "nodeType": "UseCase" },
+      "entity": { "nameSuffix": ["entity"], "nodeType": "Entity" },
+      "model": { "nameSuffix": ["model", "dto"], "nodeType": "Model" },
+      "datasource": { "nameSuffix": ["data_source", "datasource"], "nodeType": "DataSource" },
+      "page": { "nameSuffix": ["page", "screen", "view"], "nodeType": "Page" },
+      "widget": { "nameSuffix": ["widget"], "nodeType": "Widget" }
+    }
+  },
+  "architecture": {
+    "supportedArchitectures": ["clean-architecture", "layered"],
+    "defaultArchitecture": "clean-architecture",
+    "autoDetection": {
+      "clean-architecture": {
+        "requiredDirs": ["domain", "data", "presentation"],
+        "alternativeDirs": ["features"],
+        "confidence": 0.85
+      },
+      "layered": {
+        "requiredDirs": ["models", "services", "screens"],
+        "confidence": 0.7
+      }
+    },
+    "layerMappings": {
+      "clean-architecture": {
+        "domain": { "pathPatterns": ["**/domain/**"], "stereotype": "Domain" },
+        "data": { "pathPatterns": ["**/data/**"], "stereotype": "Data" },
+        "presentation": { "pathPatterns": ["**/presentation/**"], "stereotype": "Presentation" },
+        "core": { "pathPatterns": ["**/core/**"], "stereotype": "Core" }
+      }
+    }
+  },
+  "variants": {
+    "clean-bloc": {
+      "description": "Clean Architecture + BLoC + GetIt",
+      "stateManagement": "flutter_bloc",
+      "di": "get_it + injectable",
+      "serialization": "freezed + json_serializable",
+      "navigation": "go_router",
+      "testing": "bloc_test + mockito"
+    },
+    "clean-riverpod": {
+      "description": "Clean Architecture + Riverpod (built-in DI)",
+      "stateManagement": "riverpod",
+      "di": "riverpod",
+      "serialization": "freezed + json_serializable",
+      "navigation": "go_router",
+      "testing": "riverpod testing + mockito"
+    }
+  },
+  "defaultVariant": "clean-bloc",
+  "specialists": {
+    "dir": "flutter-dart"
+  },
+
+  "qualityRules": {
+    "linter": "dart-analyze",
+    "typecheck": null,
+    "critical": ["no-hardcoded-ips"],
+    "warning": ["naming-convention", "comment-style"]
+  }
+}

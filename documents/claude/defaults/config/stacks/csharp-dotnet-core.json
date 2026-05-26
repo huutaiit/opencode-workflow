@@ -1,0 +1,206 @@
+{
+  "$comment": "C# .NET Core stack",
+  "name": "C# .NET Core",
+  "language": "csharp",
+  "framework": "dotnet-core",
+  "version": { "dotnet": "9.0", "csharp": "13.0" },
+  "extensions": [".cs"],
+  "specialistDir": "csharp-dotnet",
+
+  "searchKeywords": {
+    "backend": ["C#", "ASP.NET Core", ".NET 9", "Entity Framework Core", "EF Core"],
+    "patterns": ["Clean Architecture C#", "Repository Pattern C#", "CQRS .NET", "MediatR"],
+    "libraries": ["FluentValidation", "AutoMapper", "Serilog", "SignalR"],
+    "testing": ["xUnit", "NSubstitute", "FluentAssertions"],
+    "package": ["NuGet", "dotnet add package"],
+    "exclude": ["Spring", "Java", "Maven", "Hibernate", "JPA", "Gradle"]
+  },
+
+  "parsing": {
+    "parser": "csharp-parser",
+    "extractor": "dotnet-extractor",
+    "patterns": {
+      "controller": { "attributes": ["ApiController", "Controller", "Route"], "nameSuffix": ["Controller"], "baseClasses": ["ControllerBase", "Controller"], "nodeType": "Controller" },
+      "service": { "nameSuffix": ["Service", "Handler", "Manager", "Provider"], "interfaces": ["IService"], "nodeType": "Service" },
+      "repository": { "nameSuffix": ["Repository", "Repo"], "interfaces": ["IRepository", "IGenericRepository"], "nodeType": "Repository" },
+      "entity": { "attributes": ["Table", "Entity"], "baseClasses": ["EntityBase", "BaseEntity"], "nodeType": "Entity" },
+      "dto": { "nameSuffix": ["Dto", "DTO", "Request", "Response", "Model", "ViewModel"], "nodeType": "Class" },
+      "middleware": { "interfaces": ["IMiddleware"], "nameSuffix": ["Middleware"], "nodeType": "Component" },
+      "backgroundService": { "baseClasses": ["BackgroundService"], "interfaces": ["IHostedService"], "nodeType": "Component" }
+    },
+    "attributes": {
+      "http": { "GET": ["HttpGet"], "POST": ["HttpPost"], "PUT": ["HttpPut"], "DELETE": ["HttpDelete"], "PATCH": ["HttpPatch"] },
+      "injection": ["Inject", "FromServices"],
+      "validation": ["Required", "StringLength", "Range", "EmailAddress", "RegularExpression"],
+      "authorization": ["Authorize", "AllowAnonymous"]
+    },
+    "namespaces": {
+      "controller": "*.Controllers",
+      "service": "*.Services",
+      "repository": "*.Repositories",
+      "entity": "*.Entities",
+      "dto": "*.DTOs"
+    }
+  },
+  "architecture": {
+    "supportedArchitectures": ["clean-architecture", "onion", "layered", "vertical-slices", "cqrs"],
+    "defaultArchitecture": null,
+    "autoDetection": {
+      "clean-architecture": { "requiredProjects": ["*.Domain", "*.Application", "*.Infrastructure", "*.Api"], "alternativePattern": "Domain/, Application/, Infrastructure/, Api/", "confidence": 0.9 },
+      "onion": { "requiredProjects": ["*.Core", "*.Domain", "*.Infrastructure"], "confidence": 0.85 },
+      "vertical-slices": { "requiredDirs": ["Features"], "pattern": "Features/*/{Command,Query,Handler}.cs", "indicators": ["MediatR"], "confidence": 0.85 },
+      "layered": { "requiredDirs": ["Controllers", "Services", "Data"], "confidence": 0.7 }
+    },
+    "layerMappings": {
+      "clean-architecture": {
+        "domain": { "pathPatterns": ["**/Domain/**", "**/Entities/**", "**/Core/**"], "attributes": ["Table", "Entity"], "baseClasses": ["EntityBase", "BaseEntity", "AggregateRoot"], "stereotype": "DomainEntity" },
+        "application": { "pathPatterns": ["**/Application/**", "**/Services/**", "**/Handlers/**"], "interfaces": ["IRequestHandler", "INotificationHandler"], "nameSuffix": ["Service", "Handler", "Manager"], "stereotype": "ApplicationService" },
+        "infrastructure": { "pathPatterns": ["**/Infrastructure/**", "**/Persistence/**", "**/Data/**"], "baseClasses": ["DbContext"], "stereotype": "InfrastructureAdapter" },
+        "presentation": { "pathPatterns": ["**/Controllers/**", "**/Api/**", "**/Endpoints/**"], "attributes": ["ApiController"], "baseClasses": ["ControllerBase"], "stereotype": "PresentationController" }
+      },
+      "vertical-slices": {
+        "features": { "pathPatterns": ["**/Features/**"], "pattern": "Features/{FeatureName}/{Command,Query,Handler,Validator}.cs", "stereotype": "Feature" }
+      }
+    },
+    "databasePatterns": {
+      "entity-framework": {
+        "detection": { "classes": ["DbContext", "DbSet"], "namespaces": ["Microsoft.EntityFrameworkCore"] },
+        "technology": "Entity Framework Core",
+        "patterns": ["Repository", "UnitOfWork", "Specification"],
+        "reactive": false
+      },
+      "dapper": {
+        "detection": { "namespaces": ["Dapper"], "methods": ["Query", "Execute", "QueryAsync"] },
+        "technology": "Dapper",
+        "reactive": false
+      }
+    }
+  },
+  "variants": {
+    "simplified-clean": {
+      "name": "Simplified Clean Architecture",
+      "description": "3-layer Clean Architecture without MediatR/CQRS overhead",
+      "detection": {
+        "files": ["*.csproj"],
+        "rejects": ["MediatR"],
+        "priority": 2
+      },
+      "validation": {
+        "files": ["*.csproj"],
+        "mustNotHave": ["MediatR"]
+      },
+      "patterns": {
+        "use_clean_architecture": true, "use_mediatr": false, "use_cqrs": false,
+        "use_ef_core": true, "use_repository_pattern": true, "use_signalr": true
+      },
+      "specialists": [
+        "domain-entity-specialist", "domain-value-object-specialist", "domain-event-specialist",
+        "ddd-aggregate-specialist", "service-specialist", "dto-mapper-specialist",
+        "repository-specialist", "controller-specialist",
+        "ef-core-specialist", "ef-migrations-specialist", "ef-interceptor-specialist",
+        "mssql-specialist", "clean-architecture-specialist",
+        "di-configuration-specialist", "options-configuration-specialist",
+        "authentication-specialist", "authorization-specialist",
+        "data-protection-specialist", "cors-specialist"
+      ],
+      "specialistDir": "csharp-dotnet",
+      "kb_path": {
+        "backend": ".claude/utils/knowledge-base/backend-kb-csharp-dotnet.json",
+        "database": ".claude/utils/knowledge-base/database-kb-mssql.json"
+      }
+    },
+    "clean-no-repo": {
+      "name": "Clean Architecture — No Repository",
+      "description": "Direct DbContext injection, no repository layer. For small-medium projects.",
+      "detection": {
+        "files": ["*.csproj"],
+        "rejects": ["MediatR"],
+        "priority": 3
+      },
+      "patterns": {
+        "use_clean_architecture": true, "use_mediatr": false, "use_cqrs": false,
+        "use_ef_core": true, "use_repository_pattern": false, "use_signalr": true
+      },
+      "specialists": [
+        "domain-entity-specialist", "domain-value-object-specialist", "domain-event-specialist",
+        "service-specialist", "controller-specialist", "dto-mapper-specialist",
+        "ef-core-specialist", "ef-migrations-specialist", "ef-interceptor-specialist",
+        "mssql-specialist", "clean-architecture-specialist",
+        "di-configuration-specialist", "options-configuration-specialist",
+        "authentication-specialist", "authorization-specialist",
+        "data-protection-specialist", "cors-specialist"
+      ],
+      "specialistDir": "csharp-dotnet",
+      "kb_path": {
+        "backend": ".claude/utils/knowledge-base/backend-kb-csharp-dotnet.json",
+        "database": ".claude/utils/knowledge-base/database-kb-mssql.json"
+      }
+    },
+    "clean-cqrs": {
+      "name": "Clean Architecture — CQRS + MediatR",
+      "description": "MediatR pipeline with Command/Query handlers. For complex domains.",
+      "detection": {
+        "files": ["*.csproj"],
+        "requires": ["MediatR"],
+        "priority": 1
+      },
+      "validation": {
+        "files": ["*.csproj"],
+        "mustHave": ["MediatR"]
+      },
+      "patterns": {
+        "use_clean_architecture": true, "use_mediatr": true, "use_cqrs": true,
+        "use_ef_core": true, "use_repository_pattern": false, "use_signalr": true
+      },
+      "specialists": [
+        "domain-entity-specialist", "domain-value-object-specialist", "domain-event-specialist",
+        "ddd-aggregate-specialist", "command-handler-specialist",
+        "query-handler-specialist", "pipeline-behavior-specialist",
+        "notification-handler-specialist", "validation-specialist",
+        "controller-specialist", "dto-mapper-specialist",
+        "ef-core-specialist", "ef-migrations-specialist", "ef-interceptor-specialist",
+        "mssql-specialist", "clean-architecture-specialist", "cqrs-specialist",
+        "di-configuration-specialist", "options-configuration-specialist",
+        "domain-event-bus-specialist",
+        "authentication-specialist", "authorization-specialist",
+        "data-protection-specialist", "cors-specialist"
+      ],
+      "specialistDir": "csharp-dotnet",
+      "kb_path": {
+        "backend": ".claude/utils/knowledge-base/backend-kb-csharp-dotnet.json",
+        "database": ".claude/utils/knowledge-base/database-kb-mssql.json"
+      }
+    },
+    "clean-minimal-api": {
+      "name": "Clean Architecture — Minimal API",
+      "description": "Minimal API with IEndpointGroup, no Controllers. For smaller APIs.",
+      "patterns": {
+        "use_clean_architecture": true, "use_mediatr": false, "use_cqrs": false,
+        "use_ef_core": true, "use_repository_pattern": false, "use_signalr": true,
+        "use_minimal_api": true
+      },
+      "specialists": [
+        "domain-entity-specialist", "domain-value-object-specialist", "domain-event-specialist",
+        "service-specialist", "dto-mapper-specialist",
+        "minimal-api-specialist", "api-versioning-specialist", "openapi-documentation-specialist",
+        "ef-core-specialist", "ef-migrations-specialist", "ef-interceptor-specialist",
+        "mssql-specialist", "clean-architecture-specialist",
+        "di-configuration-specialist", "options-configuration-specialist",
+        "authentication-specialist", "authorization-specialist",
+        "data-protection-specialist", "cors-specialist"
+      ],
+      "specialistDir": "csharp-dotnet",
+      "kb_path": {
+        "backend": ".claude/utils/knowledge-base/backend-kb-csharp-dotnet.json",
+        "database": ".claude/utils/knowledge-base/database-kb-mssql.json"
+      }
+    }
+  },
+
+  "qualityRules": {
+    "linter": "dotnet-format",
+    "typecheck": "dotnet-build",
+    "critical": ["no-duplicate-api", "no-hardcoded-ips"],
+    "warning": ["naming-convention", "comment-style"]
+  }
+}

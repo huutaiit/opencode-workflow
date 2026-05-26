@@ -1,0 +1,11 @@
+{
+  "stackId": "flutter-dart",
+  "stackName": "Flutter/Dart",
+  "description": "Flutter 3.x + Dart 3.x — Clean Architecture 3-Layer (feature-first)",
+  "specialistDir": "flutter-dart",
+  "totalSpecialists": 66,
+  "folders": 22,
+  "variants": ["clean-bloc", "clean-riverpod"],
+  "defaultVariant": "clean-bloc",
+  "architectureMaster": "architecture/flutter-clean-architecture-specialist.md"
+}

@@ -1,0 +1,94 @@
+{
+  "$comment": "TypeScript React (SPA) stack — Feature-Sliced Design + spa variant",
+  "name": "TypeScript React",
+  "language": "typescript",
+  "framework": "react",
+  "version": { "typescript": "5.x", "react": "19.x" },
+  "extensions": [".ts", ".tsx", ".js", ".jsx"],
+  "parsing": {
+    "parser": "typescript-parser",
+    "extractor": "react-extractor",
+    "patterns": {
+      "component": { "namePrefix": null, "exports": ["function *", "const *: FC"], "nodeType": "Component" },
+      "hook": { "namePrefix": "use", "files": ["use*.ts", "use*.tsx"], "nodeType": "Hook" },
+      "context": { "nameSuffix": ["Context", "Provider"], "exports": ["createContext"], "nodeType": "Context" },
+      "store": { "imports": ["@reduxjs/toolkit", "zustand"], "nodeType": "Component" }
+    }
+  },
+  "architecture": {
+    "supportedArchitectures": ["feature-sliced-design"],
+    "defaultArchitecture": "feature-sliced-design",
+    "autoDetection": {
+      "feature-sliced-design": {
+        "requiredDirs": ["features", "entities", "shared"],
+        "indicators": ["app/", "pages/", "widgets/"],
+        "confidence": 0.95
+      }
+    },
+    "layerMappings": {
+      "feature-sliced-design": {
+        "app": { "pathPatterns": ["**/app/**/*.ts", "**/app/**/*.tsx"], "stereotype": "App" },
+        "pages": { "pathPatterns": ["**/pages/**/*.tsx"], "stereotype": "Page" },
+        "widgets": { "pathPatterns": ["**/widgets/**/*.tsx"], "stereotype": "Widget" },
+        "features": { "pathPatterns": ["**/features/**/*.ts", "**/features/**/*.tsx"], "stereotype": "Feature" },
+        "entities": { "pathPatterns": ["**/entities/**/*.ts"], "stereotype": "Entity" },
+        "shared": { "pathPatterns": ["**/shared/**/*.ts", "**/shared/**/*.tsx"], "stereotype": "Shared" },
+        "test": { "pathPatterns": ["**/*.test.ts", "**/*.test.tsx"], "stereotype": "Test" }
+      }
+    }
+  },
+  "variants": {
+    "spa": {
+      "name": "React SPA (Feature-Sliced Design)",
+      "description": "React SPA with FSD architecture, Zustand/TanStack Query, React Router v6",
+      "patterns": {
+        "use_react_19": true,
+        "use_typescript": true,
+        "use_react_router": true,
+        "use_tanstack_query": true,
+        "use_zustand": true,
+        "use_fsd": true
+      },
+      "specialists": {
+        "core": ["react-hooks-patterns", "react-state-management", "react-typescript", "react-architecture-composition"],
+        "ui": ["react-ui-component-patterns", "react-forms-validation", "react-accessibility"],
+        "data": ["react-data-fetching", "react-websocket-realtime"],
+        "routing": ["react-routing-navigation"],
+        "security": ["react-security"],
+        "testing": ["react-testing"],
+        "performance": ["react-performance", "react-error-handling"]
+      },
+      "specialistDir": "react",
+      "kb_path": {
+        "frontend": ".claude/utils/knowledge-base/frontend-kb-react.json"
+      }
+    },
+    "enterprise": {
+      "name": "React Enterprise (FSD + AntD 5)",
+      "description": "React 19 SPA with FSD architecture, Ant Design 5, Zustand, TanStack Query v5, React Router v7",
+      "patterns": {
+        "use_react_19": true,
+        "use_typescript": true,
+        "use_fsd": true,
+        "use_antd": true,
+        "use_zustand": true,
+        "use_tanstack_query": true,
+        "use_react_router": true,
+        "use_vite": true,
+        "use_axios": true,
+        "use_signalr": true
+      },
+      "specialistDir": "reactjs-fsd",
+      "kb_path": {
+        "frontend": ".claude/utils/knowledge-base/frontend-kb-react.json"
+      }
+    }
+  },
+
+  "qualityRules": {
+    "linter": "eslint",
+    "typecheck": "tsc",
+    "critical": ["no-any", "no-duplicate-api", "no-hardcoded-strings", "no-hardcoded-ips", "eslint-zero-warnings", "npm-audit-critical"],
+    "warning": ["naming-convention", "comment-style", "import-order"]
+  }
+}

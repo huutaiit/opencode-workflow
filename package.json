@@ -1,0 +1,38 @@
+{
+  "name": "opencode-workflow",
+  "version": "1.0.0",
+  "description": "Engineering Process System workflow for opencode — auto-chain design-to-implementation pipeline",
+  "type": "module",
+  "main": "index.js",
+  "postinstall": "node postinstall.cjs",
+  "bin": {
+    "opencode-workflow": "cli.js"
+  },
+  "scripts": {
+    "test": "node tests/test-runner.js",
+    "test:unit": "node tests/test-runner.js unit",
+    "test:ops": "node tests/test-runner.js ops",
+    "test:integration": "node tests/test-runner.js integration",
+    "format": "prettier --write '**/*.{ts,js,json,md}'"
+  },
+  "keywords": [
+    "opencode",
+    "workflow",
+    "eps",
+    "engineering-process",
+    "auto-chain"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "agents/",
+    "commands/",
+    "skills/",
+    "plugins/",
+    "cli.js",
+    "index.js",
+    "postinstall.cjs"
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "$comment": "React Three.js stack — Construction 3D Viewer (R3F + Drei + Redux Toolkit + Valtio + SignalR)",
+  "name": "React Three.js (Construction 3D)",
+  "language": "typescript",
+  "framework": "react",
+  "version": { "typescript": "4.x", "react": "17.x", "three": "0.139", "react-three-fiber": "7.x" },
+  "extensions": [".ts", ".tsx"],
+
+  "searchKeywords": {
+    "frontend": ["React", "TypeScript", "Three.js", "React Three Fiber", "Drei", "3D Viewer"],
+    "patterns": ["3D Rendering", "GLTF Loading", "Camera Controls", "Mesh Interaction"],
+    "libraries": ["three", "@react-three/fiber", "@react-three/drei", "valtio", "@reduxjs/toolkit", "@microsoft/signalr"],
+    "testing": [],
+    "package": ["npm", "package.json", "craco"],
+    "exclude": ["Next.js", "FSD", "Vite", "Angular", "Vue"]
+  },
+
+  "architecture": {
+    "supportedArchitectures": ["feature-based"],
+    "defaultArchitecture": "feature-based",
+    "autoDetection": {
+      "feature-based": {
+        "requiredDirs": ["features", "services", "store"],
+        "indicators": ["features/construction/", "features/setting/"],
+        "confidence": 0.9
+      }
+    },
+    "layerMappings": {
+      "feature-based": {
+        "rendering": { "pathPatterns": ["**/features/**/ThreeEditor.tsx", "**/features/**/3dViewer.tsx", "**/features/**/3DEditor.tsx", "**/features/**/Mode2dEditor.tsx", "**/features/**/PlayHistory.tsx"], "stereotype": "3DViewer" },
+        "camera": { "pathPatterns": ["**/CameraControl.tsx", "**/Camera2DControls.tsx"], "stereotype": "Camera" },
+        "state": { "pathPatterns": ["**/state_management/**"], "stereotype": "State" },
+        "api": { "pathPatterns": ["**/services/api/**"], "stereotype": "API" },
+        "settings": { "pathPatterns": ["**/features/setting/**"], "stereotype": "Settings" },
+        "realtime": { "pathPatterns": ["**/layouts/Main.tsx"], "stereotype": "Realtime" },
+        "domain": { "pathPatterns": ["**/features/construction/**", "**/features/main/**"], "stereotype": "Domain" }
+      }
+    }
+  },
+
+  "variants": {
+    "construction-3d": {
+      "name": "React Construction 3D Viewer",
+      "description": "React 17 SPA with Three.js 3D rendering, Redux Toolkit + Valtio dual state, SignalR real-time, JP/EN i18n",
+      "detection": {
+        "files": ["package.json"],
+        "requires": ["react", "three", "@react-three/fiber"],
+        "priority": 1
+      },
+      "specialists": {
+        "rendering": [
+          "r3f-canvas-scene",
+          "gltf-model-loading",
+          "mesh-rendering",
+          "mesh-interaction",
+          "mesh-status-color",
+          "layer-separation",
+          "valtio-viewport-state"
+        ],
+        "camera": [
+          "camera-controls-3d",
+          "camera-controls-2d",
+          "camera-custom-imperative"
+        ],
+        "state": [
+          "redux-location-selector",
+          "redux-mesh-setting",
+          "redux-feature-slice-template",
+          "table-3d-sync"
+        ],
+        "realtime": [
+          "signalr-hub",
+          "pumping-lifecycle",
+          "slim-mode"
+        ],
+        "settings": [
+          "settings-crud-table",
+          "settings-form-formik"
+        ],
+        "api": [
+          "axios-client-auth",
+          "api-service-class",
+          "formdata-file-upload"
+        ],
+        "domain": [
+          "construction-page-composition",
+          "timeline-playback",
+          "i18n-jp-en"
+        ]
+      },
+      "specialistDir": "react-threejs"
+    }
+  },
+
+  "totalSpecialists": 25
+}

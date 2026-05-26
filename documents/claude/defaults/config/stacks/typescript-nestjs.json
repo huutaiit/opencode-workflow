@@ -1,0 +1,100 @@
+{
+  "$comment": "TypeScript NestJS stack — Clean Architecture, single variant (ALL)",
+  "name": "TypeScript NestJS",
+  "language": "typescript",
+  "framework": "nestjs",
+  "version": { "typescript": "5.x", "nestjs": "10.x" },
+  "extensions": [".ts"],
+  "totalSpecialists": 98,
+  "specialistDir": "nestjs",
+  "architectureMaster": "architecture/nestjs-architecture-master-specialist.md",
+  "parsing": {
+    "parser": "typescript-parser",
+    "extractor": "nestjs-extractor",
+    "patterns": {
+      "controller": { "decorators": ["Controller"], "nameSuffix": ["Controller"], "nodeType": "Controller" },
+      "service": { "decorators": ["Injectable"], "nameSuffix": ["Service"], "nodeType": "Service" },
+      "module": { "decorators": ["Module"], "nameSuffix": ["Module"], "nodeType": "Component" },
+      "guard": { "decorators": ["Injectable"], "interfaces": ["CanActivate"], "nameSuffix": ["Guard"], "nodeType": "Component" },
+      "interceptor": { "decorators": ["Injectable"], "interfaces": ["NestInterceptor"], "nameSuffix": ["Interceptor"], "nodeType": "Component" },
+      "pipe": { "decorators": ["Injectable"], "interfaces": ["PipeTransform"], "nameSuffix": ["Pipe"], "nodeType": "Component" }
+    },
+    "decorators": {
+      "http": { "GET": ["Get"], "POST": ["Post"], "PUT": ["Put"], "DELETE": ["Delete"], "PATCH": ["Patch"] },
+      "injection": ["Inject", "InjectRepository"],
+      "validation": ["UsePipes", "ValidationPipe"]
+    }
+  },
+  "architecture": {
+    "supportedArchitectures": ["clean-architecture"],
+    "defaultArchitecture": "clean-architecture",
+    "autoDetection": {
+      "clean-architecture": {
+        "requiredDirs": ["domain", "application", "infrastructure", "presentation"],
+        "indicators": ["@Module", "@Injectable", "@Controller"],
+        "confidence": 0.95
+      }
+    },
+    "layerMappings": {
+      "clean-architecture": {
+        "domain": { "pathPatterns": ["**/domain/**/*.ts"], "markers": [], "stereotype": "Entity" },
+        "application": { "pathPatterns": ["**/application/**/*.ts", "**/use-cases/**/*.ts"], "markers": ["@Injectable"], "stereotype": "Service" },
+        "infrastructure": { "pathPatterns": ["**/infrastructure/**/*.ts"], "markers": ["@Injectable", "@InjectRepository"], "stereotype": "Repository" },
+        "presentation": { "pathPatterns": ["**/presentation/**/*.ts", "**/controllers/**/*.ts"], "markers": ["@Controller"], "stereotype": "Controller" },
+        "test": { "pathPatterns": ["**/*.spec.ts", "**/*.e2e-spec.ts"], "markers": [], "stereotype": "Test" }
+      }
+    }
+  },
+  "variants": {
+    "default": {
+      "name": "NestJS (Clean Architecture)",
+      "description": "Decorator-based DI + modules + TypeORM/Prisma. Single paradigm: @Controller/@Resolver + @Injectable + class-validator. Covers REST, GraphQL, gRPC, WebSocket — all use same DI/module pattern.",
+      "patterns": {
+        "use_typeorm": true,
+        "use_class_validator": true,
+        "use_swagger": true
+      },
+      "specialists": {
+        "architecture": ["nestjs-clean-architecture", "nestjs-architecture-patterns", "nestjs-distributed-patterns"],
+        "core": ["nestjs-module-architecture", "nestjs-dependency-injection", "nestjs-error-handling", "nestjs-configuration", "nestjs-decorators-lifecycle", "nestjs-configuration-advanced"],
+        "api": ["nestjs-controller-routing", "nestjs-validation-pipes", "nestjs-middleware-interceptors", "nestjs-swagger-openapi", "nestjs-graphql", "nestjs-sse"],
+        "application": ["nestjs-service-patterns", "nestjs-mapper-patterns", "nestjs-use-case-orchestration"],
+        "data": ["nestjs-typeorm-entity-relations", "nestjs-typeorm-queries-migrations", "nestjs-database-patterns", "nestjs-data-migration", "nestjs-prisma", "nestjs-websocket-gateway", "nestjs-transaction-patterns", "nestjs-query-optimization"],
+        "cache": ["nestjs-caching-redis"],
+        "cloud": ["nestjs-cloud-aws"],
+        "messaging": ["nestjs-microservices-transport", "nestjs-grpc-patterns", "nestjs-kafka-advanced"],
+        "security": ["nestjs-auth-guards", "nestjs-security-advanced", "nestjs-oauth2-oidc", "nestjs-owasp-security", "nestjs-keycloak"],
+        "testing": ["nestjs-testing-unit-integration", "nestjs-testing-advanced"],
+        "test_plan": ["tps-nestjs-unit", "tps-nestjs-integration", "tps-nestjs-security", "tps-nestjs-performance", "tps-nestjs-e2e"],
+        "orchestration": ["nestjs-bff-orchestration"],
+        "domain": ["nestjs-lending-domain", "nestjs-risk-scoring", "nestjs-insurance-domain", "nestjs-banking-fiat-gateway", "nestjs-cbac-authorization"],
+        "blockchain": ["chaincode-core", "chaincode-advanced", "chaincode-queries-keys", "fabric-network-setup", "fabric-gateway-transactions", "fabric-chaincode-lifecycle", "fabric-sdk-client-gateway", "fabric-sdk-transactions-events", "fabric-sdk-wallet-identity"],
+        "infrastructure": ["nestjs-nx-monorepo", "nestjs-docker-deployment", "nestjs-logging", "nestjs-monitoring", "nestjs-graceful-shutdown"],
+        "gateway": ["nestjs-api-gateway-discovery", "nestjs-http-client", "nestjs-api-gateway-advanced"],
+        "cross_cutting": ["nestjs-domain-events-saga", "nestjs-observability", "nestjs-aop-interceptors", "nestjs-event-emitter", "nestjs-distributed-tracing", "nestjs-auditing"],
+        "language": ["nestjs-typescript-fundamentals", "nestjs-typescript-patterns", "nestjs-code-quality", "nestjs-async-concurrency", "nestjs-design-patterns"],
+        "devops": ["nestjs-ci-cd-patterns", "nestjs-kubernetes", "nestjs-docker-compose", "nestjs-k8s-advanced"],
+        "patterns": ["nestjs-cqrs", "nestjs-resilience-patterns", "nestjs-pagination", "nestjs-search-criteria", "nestjs-crud-base", "nestjs-workflow-orchestration", "nestjs-state-machine", "nestjs-feature-flags"],
+        "performance": ["nestjs-performance"],
+        "scheduling": ["nestjs-scheduling-queues"],
+        "search": ["nestjs-elasticsearch"],
+        "file_handling": ["nestjs-file-handling"],
+        "financial": ["nestjs-financial-domain"],
+        "analytics": ["nestjs-analytics", "nestjs-nl-to-sql"],
+        "ai_ml": ["nestjs-llm-integration"]
+      },
+      "specialistDir": "nestjs",
+      "kb_path": {
+        "backend": ".claude/utils/knowledge-base/backend-kb-nestjs.json",
+        "database": ".claude/utils/knowledge-base/database-kb-postgres.json"
+      }
+    }
+  },
+
+  "qualityRules": {
+    "linter": "eslint",
+    "typecheck": "tsc",
+    "critical": ["no-any", "no-duplicate-api", "no-hardcoded-ips", "eslint-zero-warnings", "npm-audit-critical"],
+    "warning": ["naming-convention", "comment-style", "import-order"]
+  }
+}

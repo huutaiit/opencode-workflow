@@ -1,0 +1,68 @@
+{
+  "$comment": "Python FastAPI stack — Generic specialists (ALL variants)",
+  "name": "Python FastAPI",
+  "language": "python",
+  "framework": "fastapi",
+  "version": { "python": "3.12+", "fastapi": "0.115+" },
+  "extensions": [".py"],
+  "totalSpecialists": 57,
+  "specialistDir": "python-fastapi",
+
+  "searchKeywords": {
+    "backend": ["Python", "FastAPI", "Pydantic", "SQLAlchemy"],
+    "patterns": ["Repository Pattern Python", "Service Layer Python"],
+    "libraries": ["LangChain", "LangGraph", "Celery", "Redis"],
+    "testing": ["pytest", "pytest-asyncio", "httpx"],
+    "package": ["pip", "poetry", "requirements.txt", "pyproject.toml"],
+    "exclude": ["C#", "Java", "Spring", "NuGet", "Maven"]
+  },
+
+  "parsing": {
+    "parser": "python-parser",
+    "extractor": "fastapi-extractor",
+    "patterns": {
+      "router": { "decorators": ["@router", "@app"], "nameSuffix": ["router", "api"], "nodeType": "Controller" },
+      "service": { "nameSuffix": ["service", "handler", "manager"], "nodeType": "Service" },
+      "repository": { "nameSuffix": ["repository", "repo", "dao"], "nodeType": "Repository" },
+      "model": { "baseClasses": ["BaseModel", "Base", "DeclarativeBase"], "nameSuffix": ["model", "schema"], "nodeType": "Entity" }
+    }
+  },
+  "architecture": {
+    "supportedArchitectures": ["layered", "clean-architecture", "modular"],
+    "defaultArchitecture": "modular",
+    "autoDetection": {
+      "layered": { "requiredDirs": ["routers", "services", "models"], "alternativeDirs": ["api", "core", "db"], "confidence": 0.75 },
+      "clean-architecture": { "requiredDirs": ["domain", "application", "infrastructure", "presentation"], "confidence": 0.85 },
+      "modular": { "pattern": "src/{module_name}/{router,schemas,service,models}", "confidence": 0.8 }
+    },
+    "layerMappings": {
+      "layered": {
+        "routers": { "pathPatterns": ["**/routers/**", "**/api/**"], "decorators": ["@router", "@app"], "stereotype": "Router" },
+        "services": { "pathPatterns": ["**/services/**", "**/core/**"], "stereotype": "Service" },
+        "models": { "pathPatterns": ["**/models/**", "**/schemas/**"], "baseClasses": ["BaseModel", "Base"], "stereotype": "Model" },
+        "repositories": { "pathPatterns": ["**/repositories/**", "**/db/**"], "stereotype": "Repository" }
+      }
+    }
+  },
+  "specialistGroups": {
+    "architecture": { "dir": "architecture", "patterns": "0.x", "count": 1 },
+    "presentation": { "dir": "presentation", "patterns": "1.x-2.x", "count": 2 },
+    "domain": { "dir": "domain", "patterns": "3.x-4.x", "count": 2 },
+    "application": { "dir": "application", "patterns": "5.x-7.x", "count": 3 },
+    "data-access": { "dir": "data-access", "patterns": "10.x-15.x", "count": 6 },
+    "security": { "dir": "security", "patterns": "20.x-22.x", "count": 3 },
+    "middleware": { "dir": "middleware", "patterns": "25.x-26.x", "count": 2 },
+    "file-handling": { "dir": "file-handling", "patterns": "30.x-34.x", "count": 5 },
+    "realtime": { "dir": "realtime", "patterns": "35.x-37.x", "count": 3 },
+    "messaging": { "dir": "messaging", "patterns": "40.x-41.x", "count": 2 },
+    "ai-ml-llm": { "dir": "ai-ml/llm", "patterns": "50.x-53.x", "count": 4 },
+    "ai-ml-cv": { "dir": "ai-ml/cv", "patterns": "54.x-55.x", "count": 2 },
+    "ai-ml-rag": { "dir": "ai-ml/rag", "patterns": "56.x-58.x", "count": 3 },
+    "ai-ml-serving": { "dir": "ai-ml/serving", "patterns": "59.x-61.x", "count": 3 },
+    "analytics": { "dir": "analytics", "patterns": "62.x-63.x", "count": 2 },
+    "language": { "dir": "language", "patterns": "65.x-68.x", "count": 4 },
+    "cross-cutting": { "dir": "cross-cutting", "patterns": "75.x-77.x", "count": 3 },
+    "testing": { "dir": "testing", "patterns": "80.x-81.x", "count": 2 },
+    "devops": { "dir": "devops", "patterns": "90.x-93.x", "count": 4 }
+  }
+}
