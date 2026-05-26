@@ -76,7 +76,7 @@ If context.md exists, prompt user to log key decisions made:
 
 Append to context.md decisions log.
 
-## Step 5: Confirm
+## Step 5: Confirm & Complete
 
 Display save confirmation:
 ```
@@ -85,6 +85,8 @@ Display save confirmation:
    State: {state}
    Tag: {tag || none}
 ```
+
+After displaying confirmation, **STOP** — do NOT suggest follow-ups or ask questions.
 
 ## Memory Bank Structure
 

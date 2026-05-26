@@ -69,3 +69,9 @@ Commit Status: [success/failure]
 - NEVER commit files that appear to contain secrets (.env, credentials, API keys)
 - WARN if committing lock files or large binary files
 - CONFIRM before committing if there are untracked files that might be forgotten
+
+## Completion
+
+After the commit is executed and verified:
+- Report the result (success/failure + commit hash if success)
+- **STOP** — do NOT suggest follow-ups or ask questions

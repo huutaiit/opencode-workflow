@@ -80,3 +80,9 @@ Scan complete:
 
 Module registry saved to: .opencode/config/module-registry.json
 ```
+
+## Completion
+
+After scanning and writing module registry:
+- Report the summary
+- **STOP** — do NOT suggest follow-ups or ask questions

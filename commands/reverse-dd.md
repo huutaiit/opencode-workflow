@@ -90,6 +90,12 @@ Extract from handler + router code:
 
 All written to `documents/features/{FEATURE}-{name}/`
 
+## Completion
+
+After writing all output files:
+- Report the files generated
+- **STOP** — do NOT suggest follow-ups or ask questions
+
 ## State Impact
 
 No state change (standalone utility — does not affect workflow state).

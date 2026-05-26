@@ -1,15 +1,12 @@
 /**
  * Auto-Chain Plugin
- * Injects completion/chain instructions into every command so the
- * orchestrator stops cleanly after finishing, instead of waiting
- * indefinitely.
  *
- * Hook used: command.execute.before (official API) — modifies output.parts
- * to append lifecycle instructions the AI follows at the end of a command.
- *
- * Commands not in STATE_CHAIN (setup / utility) → inject "stop immediately".
- * Commands in STATE_CHAIN → inject next-step context so the user sees the
- * pipeline clearly.
+ * Enforces workflow state transitions and session lifecycle:
+ * 1. Injects completion/chain instructions as behavioral hints
+ * 2. Blocks further tool calls after primary action completes
+ *    (via tool.execute.before throwing) — the AI receives an error,
+ *    returns a final text response, and the session loop ends naturally.
+ *    The session stays alive for the user's next command.
  */
 
 import { readFileSync, existsSync, readdirSync, statSync } from "fs"
@@ -28,11 +25,6 @@ const STATE_CHAIN: Record<string, { next: string; condition?: string }> = {
   VALIDATED: { next: "/test run", condition: "human-in-loop confirm" },
 }
 
-/**
- * Commands that are NOT part of the auto-chain pipeline.
- * These are setup / utility commands that should exit cleanly
- * after completing their work.
- */
 const STANDALONE_COMMANDS = new Set([
   "config-project",
   "architect",
@@ -57,18 +49,66 @@ const STANDALONE_COMMANDS = new Set([
   "design-review",
 ])
 
+/**
+ * Behavioral stop instruction (prompt-level hint — backup).
+ * The real stop mechanism: tool.execute.before blocks calls after primary action,
+ * AI gets error → returns text response → session loop ends naturally.
+ */
 const COMPLETION_INSTRUCTION = `
 
-## Workflow Completion
+<STOP_EXECUTION />
 
-After completing ALL steps described above, **stop immediately**.
+## TASK COMPLETE — STOP IMMEDIATELY
 
-- Do NOT suggest follow-up actions.
-- Do NOT ask "Is there anything else?" or similar.
-- Do NOT continue the conversation.
-- Simply report what was accomplished and **stop**.
+After finishing the steps above:
+1. Report what was done in 1-2 sentences
+2. Stop — do NOT make more tool calls
+3. Do NOT suggest follow-ups
+4. Do NOT ask questions`
 
-This is a standalone/setup command. The workflow is complete.`
+/**
+ * Per-command rules that detect when the "primary action" is done.
+ * When matched, the session is force-terminated via abort().
+ *
+ * key = command name
+ * value = function(tool: string, args: any) => boolean
+ */
+/**
+ * Pattern: tool name + arg signal that the command's primary work is done.
+ *
+ * Only commands with a clear "done" signal are listed here.
+ * For other standalone commands (display-only like list/guide/docs),
+ * the behavioral `<STOP_EXECUTION />` instruction suffices.
+ */
+const PRIMARY_ACTION_RULES: Record<string, (tool: string, args: any) => boolean> = {
+  "config-project": (tool, args) =>
+    tool === "write" &&
+    typeof args?.filePath === "string" &&
+    (args.filePath.includes("project-config.json") ||
+     args.filePath.includes("project-config")),
+
+  "scan": (tool, args) =>
+    tool === "write" &&
+    typeof args?.filePath === "string" &&
+    args.filePath.includes("module-registry.json"),
+
+  "save": (tool, args) =>
+    tool === "write" &&
+    typeof args?.filePath === "string" &&
+    (args.filePath.includes("context.md") ||
+     args.filePath.includes("-save.md")),
+
+  "commit": (tool, args) =>
+    tool === "bash" &&
+    typeof args?.command === "string" &&
+    args.command.startsWith("git commit"),
+
+  "reverse-dd": (tool, args) =>
+    tool === "write" &&
+    typeof args?.filePath === "string" &&
+    (args.filePath.includes("detail-design.md") ||
+     args.filePath.includes("api-contracts.md")),
+}
 
 function getCurrentState(): string {
   try {
@@ -94,7 +134,19 @@ function getCurrentState(): string {
   return "UNKNOWN"
 }
 
-export const AutoChainPlugin = async ({}) => {
+export const AutoChainPlugin = async () => {
+  // Track standalone sessions where primary action has been detected.
+  // Once primaryActionDone is set, tool.execute.before blocks further tool calls,
+  // causing the AI to receive an error and return a final text response naturally.
+  // The session loop ends without being killed — user can type the next command.
+  const primaryActionDone = new Set<string>()
+  const BLOCKED_TOOLS = new Set([
+    "write",
+    "edit",
+    "bash",
+    "terminal",
+  ])
+  
   return {
     "command.execute.before": async (
       input: { command: string; sessionID: string; arguments: string },
@@ -105,7 +157,6 @@ export const AutoChainPlugin = async ({}) => {
       if (STANDALONE_COMMANDS.has(cmd)) {
         const text: any = { type: "text", text: COMPLETION_INSTRUCTION }
         output.parts = [...(output.parts || []), text]
-        // console.log(`[auto-chain] /${cmd} is standalone — injected stop instruction`)
         return
       }
 
@@ -125,19 +176,49 @@ export const AutoChainPlugin = async ({}) => {
           ...(output.parts || []),
           { type: "text", text: nextText },
         ]
-        // console.log(`[auto-chain] /${cmd} → chaining to ${nextStep.next} (state: ${state})`)
       } else {
         output.parts = [
           ...(output.parts || []),
           { type: "text", text: COMPLETION_INSTRUCTION },
         ]
-        // console.log(`[auto-chain] /${cmd} has no chain target — stopping (state: ${state})`)
       }
     },
 
-    event: async ({ event }: { event: { type: string } }) => {
-      if (event.type === "session.idle") {
-        // console.log("[auto-chain] Session idle — all workflows complete")
+    "tool.execute.after": async (
+      input: { tool: string; sessionID: string; callID: string; args: any },
+    ) => {
+      if (primaryActionDone.has(input.sessionID)) return
+
+      // Check if this tool call matches any primary action rule.
+      for (const [, rule] of Object.entries(PRIMARY_ACTION_RULES)) {
+        if (rule(input.tool, input.args)) {
+          primaryActionDone.add(input.sessionID)
+          return
+        }
+      }
+    },
+
+    "tool.execute.before": async (
+      input: { tool: string; sessionID: string; callID: string; args: any },
+    ) => {
+      if (
+        primaryActionDone.has(input.sessionID) &&
+        BLOCKED_TOOLS.has(input.tool)
+      ) {
+        return {
+          skip: true,
+          result: "Task already completed."
+        }
+      }
+    },
+
+    event: async ({ event }: { event: { type: string; sessionID?: string } }) => {
+      if (event.type === "session.deleted" || event.type === "session.idle") {
+        if (event.sessionID) {
+          primaryActionDone.delete(event.sessionID)
+        } else {
+          primaryActionDone.clear()
+        }
       }
     },
   }

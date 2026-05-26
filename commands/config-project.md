@@ -84,11 +84,16 @@ Collect detected information:
 
 - Display detected configuration
 - Ask for confirmation if not `--force`
-- Write to `.opencode/config/project-config.json`
+- On user confirm (`yes`/`ok`): write to `.opencode/config/project-config.json`
+- On `edit`: let user adjust fields interactively
+- On `cancel`: abort with no changes
 
-## Step 4: Register Stack Specialists
+## Step 4: Confirm Save & Complete
 
-Based on detected stack, register available specialist patterns.
+After writing the file:
+- Display a brief summary of what was configured
+- Report the file path saved
+- **STOP immediately** — do NOT continue, do NOT suggest follow-ups, do NOT ask questions
 
 ## Output
 
@@ -99,3 +104,10 @@ Based on detected stack, register available specialist patterns.
 ## State Impact
 
 No state change (setup command — run once per project).
+
+## Critical: Completion Behavior
+
+This is a **standalone setup command**. After completing the steps above:
+1. Report the result in 1-2 sentences
+2. **Stop immediately**
+3. Do NOT suggest next steps or ask "anything else"
