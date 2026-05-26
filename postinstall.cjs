@@ -15,7 +15,7 @@ function scaffold(targetDir) {
     ".opencode/commands",
     ".opencode/skills",
     ".opencode/plugins",
-    ".opencode/configs",
+    ".opencode/config",
     ".opencode/memory-bank",
   ]
 

@@ -1,7 +1,5 @@
 ---
 description: Refactoring session - improves code quality without changing behavior
-agent: refactorer
-subtask: true
 ---
 # Refactor Mode - Code Quality Improvement
 

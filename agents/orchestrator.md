@@ -1,7 +1,7 @@
 ---
 description: Master coordinator that decomposes complex tasks, delegates to specialist subagents, and synthesizes results. Use PROACTIVELY for multi-step implementations, cross-cutting changes, or when multiple perspectives are needed.
 mode: primary
-model: anthropic/claude-opus-4-5-20251101
+model: nvidia/qwen/qwen3.5-122b-a10b
 temperature: 0.2
 tools:
   write: true

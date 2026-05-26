@@ -1,7 +1,5 @@
 ---
 description: List all features, contexts, and saves in the memory bank
-agent: orchestrator
-subtask: true
 ---
 
 # LIST Command — Memory Bank Index

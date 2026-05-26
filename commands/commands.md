@@ -1,7 +1,5 @@
 ---
 description: Command dashboard — list all available commands grouped by stage
-agent: orchestrator
-subtask: true
 ---
 
 # COMMANDS Command — Dashboard

@@ -1,6 +1,5 @@
 ---
 description: Create git commit with auto-generated conventional commit message
-agent: build
 ---
 # Git Commit Command
 

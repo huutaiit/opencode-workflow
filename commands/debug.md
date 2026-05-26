@@ -1,7 +1,5 @@
 ---
 description: Debugging session - systematic problem investigation
-agent: debugger
-subtask: true
 ---
 # Debug Mode - Systematic Problem Investigation
 

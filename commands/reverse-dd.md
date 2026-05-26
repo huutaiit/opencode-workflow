@@ -1,7 +1,5 @@
 ---
 description: Reverse engineer existing code into Detail Design documents
-agent: orchestrator
-subtask: true
 ---
 
 # REVERSE-DD Command — Reverse Engineering to Detail Design

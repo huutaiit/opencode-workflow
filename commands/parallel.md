@@ -1,6 +1,5 @@
 ---
 description: Demonstrate parallel execution by launching multiple agents simultaneously
-agent: build
 ---
 # Parallel Execution Command
 

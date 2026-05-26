@@ -1,7 +1,5 @@
 ---
 description: Quality review for Detail Design — hard gates (binary) + soft scores (0-100)
-agent: orchestrator
-subtask: true
 ---
 
 # DESIGN-REVIEW Command — Detail Design Quality Review

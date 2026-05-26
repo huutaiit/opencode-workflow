@@ -1,7 +1,5 @@
 ---
 description: Fast iteration mode - quick fixes without extensive planning
-agent: build
-subtask: false
 ---
 # Rapid Mode - Fast Iteration
 

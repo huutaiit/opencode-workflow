@@ -1,6 +1,5 @@
 ---
 description: Multi-phase verification of implementation with adversarial review
-agent: build
 ---
 # Verify Changes Command
 

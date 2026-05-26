@@ -1,7 +1,5 @@
 ---
 description: Auto-detect project tech stack from build files and create project configuration
-agent: orchestrator
-subtask: true
 ---
 
 # CONFIG-PROJECT Command — Tech Stack Detection

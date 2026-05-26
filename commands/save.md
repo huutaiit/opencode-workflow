@@ -1,7 +1,5 @@
 ---
 description: Save conversation context to branch-aware memory bank with snapshot and decisions log
-agent: orchestrator
-subtask: true
 ---
 
 # SAVE Command — Context Persistence

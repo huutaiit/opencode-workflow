@@ -1,7 +1,5 @@
 ---
 description: Load saved context from branch-aware memory bank into conversation
-agent: orchestrator
-subtask: true
 ---
 
 # RECALL Command — Context Restoration

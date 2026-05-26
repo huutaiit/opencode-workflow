@@ -1,7 +1,5 @@
 ---
 description: Comprehensive code review - checks security, performance, maintainability
-agent: code-reviewer
-subtask: true
 ---
 # Review Mode - Comprehensive Code Review
 

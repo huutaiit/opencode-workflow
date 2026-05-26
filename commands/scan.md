@@ -1,7 +1,5 @@
 ---
 description: Scan source code — index, analyze, and extract module information for RAG
-agent: orchestrator
-subtask: true
 ---
 
 # SCAN Command — Source Code Analysis

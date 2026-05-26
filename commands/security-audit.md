@@ -1,7 +1,5 @@
 ---
 description: Security audit with OWASP Top 10 vulnerability check
-agent: security-auditor
-subtask: true
 ---
 # Security Audit Command
 

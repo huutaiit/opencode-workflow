@@ -1,7 +1,5 @@
 ---
 description: Learning and teaching mode - explains decisions, provides context, educational approach
-agent: orchestrator
-subtask: true
 ---
 # Mentor Mode - Educational Session
 

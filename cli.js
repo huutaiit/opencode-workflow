@@ -75,7 +75,7 @@ async function main() {
       ".opencode/commands",
       ".opencode/skills",
       ".opencode/plugins",
-      ".opencode/configs",
+      ".opencode/config",
       ".opencode/memory-bank",
     ]
 
@@ -148,7 +148,7 @@ async function main() {
     }
     console.log("✅ .opencode/ exists")
 
-    const checks = ["agent", "command", "skill", "plugin", "config"]
+    const checks = ["agents", "commands", "skills", "plugins", "config"]
     for (const dir of checks) {
       const fullPath = path.join(opencodeDir, dir)
       if (fs.existsSync(fullPath)) {

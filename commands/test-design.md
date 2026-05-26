@@ -1,7 +1,5 @@
 ---
 description: Design test coverage strategy with test-architect guidance
-agent: test-architect
-subtask: true
 ---
 # Test Design Command
 

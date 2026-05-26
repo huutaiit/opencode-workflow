@@ -1,7 +1,5 @@
 ---
 description: Generate documentation (API docs, READMEs, guides)
-agent: docs-writer
-subtask: true
 ---
 # Documentation Generation Command
 

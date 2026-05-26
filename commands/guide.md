@@ -1,7 +1,5 @@
 ---
 description: User guide for opencode workflow — workflow modes, command reference, quick start (Vietnamese)
-agent: orchestrator
-subtask: true
 ---
 
 # GUIDE Command — Hướng dẫn Workflow
