@@ -7,6 +7,11 @@
  *    (via tool.execute.before throwing) — the AI receives an error,
  *    returns a final text response, and the session loop ends naturally.
  *    The session stays alive for the user's next command.
+ * 3. On primary action detection, immediately interrupts the session via
+ *    client.tui.executeCommand("session.interrupt") to stop the AI from
+ *    continuing to think/generate, without destroying the session.
+ *    This handles the case where the AI doesn't make any more tool calls
+ *    after completing the primary action.
  */
 
 import { readFileSync, existsSync, readdirSync, statSync } from "fs"
@@ -68,7 +73,8 @@ After finishing the steps above:
 
 /**
  * Per-command rules that detect when the "primary action" is done.
- * When matched, the session is force-terminated via abort().
+ * When matched, the session is interrupted via tui.executeCommand("session.interrupt")
+ * and tool.execute.before blocks any further tool calls.
  *
  * key = command name
  * value = function(tool: string, args: any) => boolean
@@ -134,7 +140,7 @@ function getCurrentState(): string {
   return "UNKNOWN"
 }
 
-export const AutoChainPlugin = async () => {
+export const AutoChainPlugin = async ({ client }: { client: any }) => {
   const primaryActionDone = new Map<string, number>()
   const RETRY_LIMIT = 2
 
@@ -183,6 +189,16 @@ export const AutoChainPlugin = async () => {
       for (const [, rule] of Object.entries(PRIMARY_ACTION_RULES)) {
         if (rule(input.tool, input.args)) {
           primaryActionDone.set(input.sessionID, 0)
+
+          // Immediately interrupt the session to stop the AI from thinking/generating.
+          // session.interrupt pauses the AI generation but keeps the session alive,
+          // unlike session.abort which permanently kills the session.
+          // This handles the case where the AI doesn't make any more tool calls
+          // after the primary action (the tool.execute.before backup can't fire).
+          if (client?.tui?.executeCommand) {
+            client.tui.executeCommand({ body: { command: "session.interrupt" } }).catch(() => {})
+          }
+
           return
         }
       }
