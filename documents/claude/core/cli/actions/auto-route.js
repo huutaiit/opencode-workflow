@@ -94,6 +94,29 @@ module.exports = {
       else if (promptLower.includes("/design --detail")) overrideHandler = "design-detail";
       else if (promptLower.includes("/research")) overrideHandler = "research";
       else if (promptLower.includes("/innovate")) overrideHandler = "innovate";
+      else if (promptLower.includes("/config-project")) overrideHandler = "config-project";
+      else if (promptLower.includes("/scan")) overrideHandler = "scan";
+      else if (promptLower.includes("/save")) overrideHandler = "save";
+      else if (promptLower.includes("/recall")) overrideHandler = "recall";
+      else if (promptLower.includes("/guide")) overrideHandler = "guide";
+
+      // For INITIAL state on non-command prompts, suppress /research suggestion
+      // to avoid interfering with in-progress multi-step commands (like config-project)
+      if (!overrideHandler && currentState === "INITIAL") {
+        const workflowCmds = ["/research","/plan","/design","/execute","/validate","/test","/innovate"];
+        const hasWorkflowCmd = workflowCmds.some(c => promptLower.includes(c));
+        if (!hasWorkflowCmd) {
+          return {
+            route: "continue",
+            state: currentState,
+            taskType,
+            featureId: context.featureName,
+            reason: "Non-command prompt — let AI continue current flow",
+            handler: "continue",
+            contextPath,
+          };
+        }
+      }
 
       return {
         route: overrideHandler || routeEntry.handler,

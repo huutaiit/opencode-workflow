@@ -371,11 +371,6 @@ Use the Write tool to save `.claude/config/project-config.json`.
 ### Files Updated
 
 - `.claude/config/project-config.json`
-
-**Next Commands:**
-- `/scan` — Index source code into RAG
-- `/research` — Start new feature research
-- `/guide` — View EPS workflow guide
 ```
 
 ---

@@ -136,7 +136,7 @@ function getCurrentState(): string {
 
 export const AutoChainPlugin = async () => {
   const primaryActionDone = new Map<string, number>()
-  const RETRY_LIMIT = 3
+  const RETRY_LIMIT = 2
 
   return {
     "command.execute.before": async (
@@ -196,81 +196,16 @@ export const AutoChainPlugin = async () => {
 
       if (retries >= RETRY_LIMIT) {
         throw new Error(
-          `SYSTEM: The setup command has already completed its work. ` +
-          `Your task is finished. Return your final response to the user ` +
-          `and stop. Do not make any more tool calls.`
+          `SYSTEM: The command has completed its work. ` +
+          `Your task is finished. Return your final response and stop.`
         )
       }
 
       primaryActionDone.set(input.sessionID, retries + 1)
       throw new Error(
-        `SYSTEM: The primary action for this command has completed successfully. ` +
-        `Do not make any more tool calls. Return your final response now.`
+        `SYSTEM: The primary action is done. ` +
+        `Do not make more tool calls. Return your final response and stop.`
       )
-    },
-
-    event: async ({ event }: { event: { type: string; sessionID?: string } }) => {
-      if (event.type === "session.deleted" || event.type === "session.idle") {
-        if (event.sessionID) {
-          primaryActionDone.delete(event.sessionID)
-        } else {
-          primaryActionDone.clear()
-        }
-      }
-    },
-  }
-}
-
-      const state = getCurrentState()
-      const nextStep = STATE_CHAIN[state]
-
-      if (nextStep) {
-        const nextText = [
-          `\n\n## Chain Context`,
-          `Current workflow state: **${state}**`,
-          `Next step after this command: **${nextStep.next}**${nextStep.condition ? ` (${nextStep.condition})` : ""}`,
-          ``,
-          `After completing ALL steps above, state the next step and **stop**.`,
-          `Do NOT suggest follow-up actions or continue the conversation.`,
-        ].join("\n")
-        output.parts = [
-          ...(output.parts || []),
-          { type: "text", text: nextText },
-        ]
-      } else {
-        output.parts = [
-          ...(output.parts || []),
-          { type: "text", text: COMPLETION_INSTRUCTION },
-        ]
-      }
-    },
-
-    "tool.execute.after": async (
-      input: { tool: string; sessionID: string; callID: string; args: any },
-    ) => {
-      if (primaryActionDone.has(input.sessionID)) return
-
-      // Check if this tool call matches any primary action rule.
-      for (const [, rule] of Object.entries(PRIMARY_ACTION_RULES)) {
-        if (rule(input.tool, input.args)) {
-          primaryActionDone.add(input.sessionID)
-          return
-        }
-      }
-    },
-
-    "tool.execute.before": async (
-      input: { tool: string; sessionID: string; callID: string; args: any },
-    ) => {
-      if (
-        primaryActionDone.has(input.sessionID) &&
-        BLOCKED_TOOLS.has(input.tool)
-      ) {
-        return {
-          skip: true,
-          result: "Task already completed."
-        }
-      }
     },
 
     event: async ({ event }: { event: { type: string; sessionID?: string } }) => {
